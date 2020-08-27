@@ -2,7 +2,7 @@ let data = {
   price: 5,
   quantity: 2
 }
-let target, total, salePrice
+let target = null;
 
 class Dep {
   constructor() {
@@ -20,41 +20,58 @@ class Dep {
   }
 }
 
+let deps = new Map();
 Object.keys(data).forEach(key => {
-  let internalValue = data[key]
-  const dep = new Dep()
+  // Each property gets a dependency instance
+  deps.set(key, new Dep());
+});
 
-  Object.defineProperty(data, key, {
-    get() {
-      dep.depend() // <-- Remember the target we're running
+let data_without_proxy = data // Save old data object
 
-      return internalValue
-    },
-    set(newVal) {
-      internalValue = newVal
-      dep.notify() // <-- Rerun saved targets
-    }
-  })
-})
+data = new Proxy(data_without_proxy, {  // Override data to have a proxy in the middle
+  get(obj, key) {
+    deps.get(key).depend(); // <-- Remember the target we're running
 
+    return obj[key]; // call original data
+  },
+
+  set(obj, key, newVal) {
+    obj[key] = newVal; // Set original data to new value
+    deps.get(key).notify(); // <-- Re-run stored functions
+
+    return true;
+  }
+});
+
+// The code to watch to listen for reactive properties
 function watcher(myFunc) {
   target = myFunc
   target()
   target = null
 }
 
-watcher(() => {
-  total = data.price * data.quantity
-})
+
+let total = 0
 
 watcher(() => {
-  salePrice = data.price * 0.9
-})
+  total = data.price * data.quantity;
+});
 
-console.log(`total: ${ total }`)
-console.log(`salePrice: ${salePrice}`)
-data.price = 20
-console.log(`total: ${ total }`)
-console.log(`salePrice: ${salePrice}`)
-data.quantity = 10
-console.log(`total: ${ total }`)
+console.log("total = " + total);
+data.price = 20;
+console.log("total = " + total);
+data.quantity = 10;
+console.log("total = " + total);
+
+deps.set('discount', new Dep())
+data['discount'] = 5;
+
+let salePrice = 0;
+
+watcher(() => {
+  salePrice = data.price - data.discount;
+});
+
+console.log("salePrice = " + salePrice);
+data.discount = 7.5
+console.log("salePrice = " + salePrice);
