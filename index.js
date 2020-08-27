@@ -18,13 +18,18 @@ const dep = new Dep()
 let price = 5
 let quantity = 2
 let total = 0
+let target = null
 
-let target = () => {
-  total = price * quantity
+function watcher(myFunc) {
+  target = myFunc
+  dep.depend()
+  target()
+  target = null
 }
 
-dep.depend()
-target()
+watcher(() => {
+  total = price * quantity
+})
 
 console.log(`total is ${total}`)
 
