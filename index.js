@@ -37,3 +37,23 @@ price = 20
 dep.notify()
 
 console.log(`total is ${total}`)
+
+let data = {
+  price: 5,
+  quantity: 2
+}
+let internalValue = data.price
+
+Object.defineProperty(data, "price", {
+  get() {
+    console.log(`Getting price: ${internalValue}`)
+    return internalValue
+  },
+  set(newVal) {
+    console.log(`Setting price: ${newVal}`)
+    internalValue = newVal
+  }
+})
+
+data.price
+data.price = 20
