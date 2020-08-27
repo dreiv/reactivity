@@ -1,3 +1,9 @@
+let data = {
+  price: 5,
+  quantity: 2
+}
+let target, total, salePrice
+
 class Dep {
   constructor() {
     this.subscribers = []
@@ -13,54 +19,42 @@ class Dep {
     this.subscribers.forEach(sub => sub())
   }
 }
-const dep = new Dep()
 
-let price = 5
-let quantity = 2
-let total = 0
-let target = null
+Object.keys(data).forEach(key => {
+  let internalValue = data[key]
+  const dep = new Dep()
+
+  Object.defineProperty(data, key, {
+    get() {
+      dep.depend() // <-- Remember the target we're running
+
+      return internalValue
+    },
+    set(newVal) {
+      internalValue = newVal
+      dep.notify() // <-- Rerun saved targets
+    }
+  })
+})
 
 function watcher(myFunc) {
   target = myFunc
-  dep.depend()
   target()
   target = null
 }
 
 watcher(() => {
-  total = price * quantity
+  total = data.price * data.quantity
 })
 
-console.log(`total is ${total}`)
-
-price = 20
-dep.notify()
-
-console.log(`total is ${total}`)
-
-let data = {
-  price: 5,
-  quantity: 2
-}
-let internalValue = data.price
-
-Object.keys(data).forEach(key => {
-  let internalValue = data[key]
-
-  Object.defineProperty(data, key, {
-    get() {
-      console.log(`Getting ${key}: ${internalValue}`)
-
-      return internalValue
-    },
-    set(newVal) {
-      console.log(`Setting ${key}: ${newVal}`)
-      internalValue = newVal
-    }
-  })
+watcher(() => {
+  salePrice = data.price * 0.9
 })
 
-total = data.price * data.quantity
-console.log(total)
+console.log(`total: ${ total }`)
+console.log(`salePrice: ${salePrice}`)
 data.price = 20
-console.log(total)
+console.log(`total: ${ total }`)
+console.log(`salePrice: ${salePrice}`)
+data.quantity = 10
+console.log(`total: ${ total }`)
