@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/dreiv/reactivity/issues"
   },
-  "homepage": "https://github.com/dreiv/reactivity#readme"
+  "homepage": "https://github.com/dreiv/reactivity#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
 }
