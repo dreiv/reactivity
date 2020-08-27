@@ -44,16 +44,23 @@ let data = {
 }
 let internalValue = data.price
 
-Object.defineProperty(data, "price", {
-  get() {
-    console.log(`Getting price: ${internalValue}`)
-    return internalValue
-  },
-  set(newVal) {
-    console.log(`Setting price: ${newVal}`)
-    internalValue = newVal
-  }
+Object.keys(data).forEach(key => {
+  let internalValue = data[key]
+
+  Object.defineProperty(data, key, {
+    get() {
+      console.log(`Getting ${key}: ${internalValue}`)
+
+      return internalValue
+    },
+    set(newVal) {
+      console.log(`Setting ${key}: ${newVal}`)
+      internalValue = newVal
+    }
+  })
 })
 
-data.price
+total = data.price * data.quantity
+console.log(total)
 data.price = 20
+console.log(total)
